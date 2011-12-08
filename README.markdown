@@ -1,7 +1,11 @@
 Splashy
 =======
 
-Simple distribution-based sampling of arbitrary objects from pools. Splashy. Pools. Get it!?
+Simple distribution-based sampling of arbitrary objects from pools. Splashy.
+Pools. Get it!?
+
+Disclaimer: I have a BFA in Art, so I'm convinced there's a far better algorithm
+than the awful one I came up with. Pull request button is thataway.
 
 ```ruby
 # Initialize with a desired final distribution.
