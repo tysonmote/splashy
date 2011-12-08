@@ -7,13 +7,12 @@ rescue Bundler::BundlerError => e
   $stderr.puts "Run `bundle install` to install missing gems"
   exit e.status_code
 end
-require 'minitest/unit'
+require 'minitest/autorun'
+# require 'minitest/unit'
+require 'minitest/benchmark'
 
 $LOAD_PATH.unshift(File.dirname(__FILE__))
 $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
-require 'buckets'
-
-class MiniTest::Unit::TestCase
-end
+require 'splashy'
 
 MiniTest::Unit.autorun

@@ -1,7 +1,41 @@
-buckets
+Splashy
 =======
 
-Simple distribution-based sampling of arbitrary objects.
+Simple distribution-based sampling of arbitrary objects from pools. Splashy. Pools. Get it!?
+
+    # Initialize with a desired final distribution.
+    buckets = Splashy::Buckets.new( :easy => 0.3, :hard => 0.7 )
+    
+    # You can also specify a limit on elements in the final selection, no matter
+    # how many objects you collect.
+    buckets = Splashy::Buckets.new( {:easy => 0.3, :hard => 0.7}, 5 )
+    
+    # Fill one-by-one:
+    buckets.add( :easy, obj1 )
+    buckets.add( :hard, obj2 )
+    
+    # Fill using blocks:
+    i = 0
+    buckets.fill do |total_count|
+      bucket = [:easy, :hard][total_count % 1]
+      total_count < 100 ? [bucket, object] : nil
+    end
+    buckets.fill( :easy ) do |total_count|
+      total_count < 105 ? object : nil
+    end
+    
+    # Get a distribution of objects:
+    buckets = Splashy::Buckets.new( :a => 0.01, :b => 0.19, :c => 0.80 )
+    10.times { |i| buckets.add( :a, "1#{i}") }
+    2.times { |i| buckets.add( :b, "2#{i}") }
+    40.times { |i| buckets.add( :c, "3#{i}") }
+    buckets.select
+    # Returns:
+    #   {
+    #     :a => ["10"],
+    #     :b => ["20", "21"],
+    #     :c => ["30", "31", "32", "33", "34", "35", "36", "37"]
+    #   }
 
 Contributing
 ============
