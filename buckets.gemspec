@@ -5,7 +5,7 @@
 
 Gem::Specification.new do |s|
   s.name = %q{buckets}
-  s.version = ""
+  s.version = "0.0.1"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Tyson Tate"]
@@ -17,12 +17,13 @@ Gem::Specification.new do |s|
     "README.markdown"
   ]
   s.files = [
-    ".document",
     "Gemfile",
     "Gemfile.lock",
     "LICENSE.txt",
     "README.markdown",
     "Rakefile",
+    "VERSION",
+    "buckets.gemspec",
     "lib/splashy.rb",
     "lib/splashy/bucket.rb",
     "lib/splashy/buckets.rb",
