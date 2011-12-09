@@ -42,6 +42,9 @@ module Splashy
     
     # Public: Add a single element to a bucket.
     def add( bucket_name, element )
+      unless @wanted_distribution[bucket_name]
+        raise ArgumentError.new( "#{bucket_name.inspect} is not a valid bucket." )
+      end
       @buckets[bucket_name] << element
       @total_count += 1
     end

@@ -61,6 +61,13 @@ describe Splashy::Buckets do
         @buckets.select
       end
     end
+    
+    it "fails when trying to add to an invalid bucket" do
+      @buckets = Splashy::Buckets.new({ :a => 0.80, :b => 0.2 } )
+      assert_raises( ArgumentError ) do
+        @buckets.add( :x, "oops" )
+      end
+    end
   end
   
   describe "success" do
