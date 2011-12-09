@@ -47,7 +47,7 @@ Changelog
 =========
 
 * 0.0.2 - Raise `ArgumentError` when trying to add to a bucket that doesn't 
-exist.
+exist, don't consider an empty bucket "satisfied".
 * 0.0.1 - Initial release.
 
 Contributing
