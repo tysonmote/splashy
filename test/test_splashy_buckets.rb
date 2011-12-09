@@ -68,6 +68,15 @@ describe Splashy::Buckets do
         @buckets.add( :x, "oops" )
       end
     end
+    
+    it "fails with distribution being such that desired count can't be met" do
+      @buckets = Splashy::Buckets.new({ :a => 0.80, :b => 0.1, :c => 0.10 } )
+      fill_with_counts( 1, 2, 0 )
+      assert !@buckets.satisfied?
+      assert_raises( Splashy::DistributionUnsatisfiedError ) do
+        @buckets.select
+      end
+    end
   end
   
   describe "success" do

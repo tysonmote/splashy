@@ -10,8 +10,9 @@ module Splashy
       end
       @wanted_distribution = wanted_distribution
       @wanted_count = wanted_count
-      @buckets = Hash.new do |hash, name|
-        hash[name] = Bucket.new( name )
+      @buckets = {}
+      @wanted_distribution.keys.each do |bucket_name|
+        @buckets[bucket_name] = Bucket.new( bucket_name )
       end
       @total_count = 0
     end
@@ -130,6 +131,13 @@ module Splashy
       if @total_count < @wanted_distribution.size
         raise DistributionUnsatisfiedError.new(
           "Not enough elements (#{@total_count})."
+        )
+      end
+      
+      empty_buckets = @buckets.keys.select{ |name| @buckets[name].empty? }
+      unless empty_buckets.empty?
+        raise DistributionUnsatisfiedError.new(
+          "The following buckets are empty: #{empty_buckets.map{|b| b}.join(', ')}."
         )
       end
       
