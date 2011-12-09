@@ -43,6 +43,13 @@ buckets.select
 #   }
 ```
 
+Changelog
+=========
+
+* 0.0.2 - Raise `ArgumentError` when trying to add to a bucket that doesn't 
+exist.
+* 0.0.1 - Initial release.
+
 Contributing
 ============
 
