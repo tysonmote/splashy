@@ -13,11 +13,11 @@ require 'rake'
 
 require 'jeweler'
 Jeweler::Tasks.new do |gem|
-  gem.name = "buckets"
-  gem.homepage = "http://github.com/tysontate/buckets"
+  gem.name = "splashy"
+  gem.homepage = "http://github.com/tysontate/splashy"
   gem.license = "MIT"
-  gem.summary = "Simple distribution-based sampling of arbitrary objects."
-  gem.description = "Simple distribution-based sampling of arbitrary objects via the use of, well, buckets."
+  gem.summary = "Simple distribution-based sampling of arbitrary objects from buckets."
+  gem.description = "Simple distribution-based sampling of arbitrary objects from any number of buckets. Splashy. Buckets. Get it!?"
   gem.email = "tyson@tysontate.com"
   gem.authors = ["Tyson Tate"]
 end
