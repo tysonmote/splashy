@@ -213,7 +213,7 @@ describe Splashy::Buckets do
     end
     
     it "selects from a pool with an uneven distribution" do
-      @buckets = Splashy::Buckets.new( {:a => 0.33, :b => 0.33, :c => 0.34}, 5 )
+      @buckets = Splashy::Buckets.new( {:a => 0.34, :b => 0.32, :c => 0.34}, 5 )
       fill_with_counts( 10, 2, 40 )
       assert @buckets.satisfied?
       assert_equal(
@@ -263,7 +263,7 @@ describe Splashy::Buckets do
     end
     
     it "reports on a pool with a wacky distribution" do
-      @buckets = Splashy::Buckets.new( {:a => 0.01, :b => 0.01, :c => 0.98} )
+      @buckets = Splashy::Buckets.new( {:a => 0.02, :b => 0.01, :c => 0.97} )
       fill_with_counts( 3, 3, 3 )
       assert_equal( [:c, :a, :b], @buckets.neediest_buckets )
     end
