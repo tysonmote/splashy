@@ -46,6 +46,12 @@ buckets.select
 Changelog
 =========
 
+* 0.1.0 - Several bug fixes, add "neediest_buckets" method to Buckets to allow
+you to choose which buckets to add to first if an element can be put in
+multiple buckets, final distributions can now have empty buckets if it means
+we meet the wanted distribution better (i.e. a 99% % 1% distribution with 5
+and 1 elements, respectively, which will now select 4 and 0 elements if your
+wanted count is 4).
 * 0.0.2 - Raise `ArgumentError` when trying to add to a bucket that doesn't 
 exist, don't consider an empty bucket "satisfied".
 * 0.0.1 - Initial release.

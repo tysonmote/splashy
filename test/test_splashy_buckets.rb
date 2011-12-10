@@ -227,7 +227,7 @@ describe Splashy::Buckets do
       fill_with_counts( 10, 2, 40 )
       assert @buckets.satisfied?
       assert_equal(
-        {:a=>["10"], :b=>["20"], :c=>["30", "31", "32", "33", "34", "35"]},
+        {:a=>[], :b=>["20", "21"], :c=>["30", "31", "32", "33", "34", "35"]},
         @buckets.select
       )
     end
@@ -237,15 +237,41 @@ describe Splashy::Buckets do
       fill_with_counts( 3, 3, 3 )
       assert @buckets.satisfied?
       assert_equal(
-        {:a=>["10"], :b=>["20"], :c=>["30"]},
+        {:a=>[], :b=>[], :c=>["30", "31", "32"]},
         @buckets.select
       )
     end
   end
   
+  describe "variances" do
+    it "reports on a pool with an even distribution" do
+      @buckets = Splashy::Buckets.new( {:a => 0.33, :b => 0.33, :c => 0.34} )
+      fill_with_counts( 10, 2, 40 )
+      assert_equal( [:b, :a, :c], @buckets.neediest_buckets )
+    end
+    
+    it "reports on a pool with an uneven distribution" do
+      @buckets = Splashy::Buckets.new( {:a => 0.33, :b => 0.33, :c => 0.34}, 3 )
+      fill_with_counts( 10, 2, 40 )
+      assert_equal( [:b, :a, :c], @buckets.neediest_buckets )
+    end
+    
+    it "reports on a pool with a skewed distribution" do
+      @buckets = Splashy::Buckets.new( {:a => 0.01, :b => 0.19, :c => 0.80} )
+      fill_with_counts( 10, 2, 1 )
+      assert_equal( [:c, :b, :a], @buckets.neediest_buckets )
+    end
+    
+    it "reports on a pool with a wacky distribution" do
+      @buckets = Splashy::Buckets.new( {:a => 0.01, :b => 0.01, :c => 0.98} )
+      fill_with_counts( 3, 3, 3 )
+      assert_equal( [:c, :a, :b], @buckets.neediest_buckets )
+    end
+  end
+  
   describe "performance" do
     it "grows linearly with more elements" do
-      puts
+      puts # Formatting...
       assert_performance_linear 0.999 do |n|
         @buckets = Splashy::Buckets.new( :a => 0.20, :b => 0.30, :c => 0.50 )
         n.times do |i|
@@ -257,3 +283,4 @@ describe Splashy::Buckets do
     end
   end
 end
+

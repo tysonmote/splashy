@@ -17,13 +17,13 @@ module Splashy
       @total_count = 0
     end
     
-    # Public: Put elements into buckets.
+    # Public: Put elements into buckets with a block.
     # 
     # bucket_name - If supplied, all yielded elements will be added to that
     #               bucket.
-    # &block      - A block that returns (if `bucket_name` is not supplied)
-    #               an Array: [bucket_name, element]. If `bucket_name` is
-    #               supplied, only the element needs to be returned.
+    # &block - A block that returns (if `bucket_name` is not supplied) an
+    #          Array: [bucket_name, element]. If `bucket_name` is supplied, only
+    #          the element needs to be returned.
     # 
     # Examples
     # 
@@ -50,7 +50,10 @@ module Splashy
       @total_count += 1
     end
     
-    # Returns true if the conditions are satisfied enough to select.
+    # Public
+    # 
+    # Returns true if the conditions (distribution and, optionally, count) are
+    # satisfied enough to do a final selection of elements.
     def satisfied?
       begin
         self.assert_satisfied!
@@ -64,61 +67,123 @@ module Splashy
     # distribution. If a satisfactory distribution is not possible, a
     # DistributionUnsatisfiedError is raised.
     # 
-    # Returns a Hash of elements based on the desired distribution, keyed by
+    # Returns a Hash of elements matching the desired distribution, keyed by
     # the bucket names.
     def select
       self.assert_satisfied!
-      
-      total_count = estimated_final_count
-      
-      selected = @wanted_distribution.keys.inject({}) do |memo, bucket_name|
-        bucket = @buckets[bucket_name]
-        count = total_count * @wanted_distribution[bucket_name]
-        count = [1, count.round].max
-        memo[bucket_name] = bucket.elements( count )
-        memo
-      end
-      
+      selected = self._select_wanted
       # Sometimes we need to fudge by a few to meet the `@wanted_count`
-      selected = self.trim( selected ) if @wanted_count
-      
+      selected = self.trim( selected, @wanted_count ) if @wanted_count
       selected
+    end
+    
+    # Array of the buckets that need more elements to match the desired
+    # distribution, sorted descending by how much more they need.
+    def neediest_buckets
+      multipliers = self.needed_multipliers( self._select_all, @wanted_distribution ).to_a
+      multipliers.sort! { |a, b| b[1] <=> a[1] } # Sort on multiplier ascending
+      multipliers.map{ |bucket_name, multiplier| bucket_name }
     end
     
     protected
     
-    # Trim a given Hash of Arrays keyed by bucket names until it meets
-    # @wanted_count.
-    def trim( selected )
-      raise ArgumentError.new( "Can't trip to a nil @wanted_count" ) unless @wanted_count
+    # Protected
+    # 
+    # Returns Hash of all bucket elements, keyed by bucket name.
+    def _select_all
+      @buckets.values.inject({}) do |memo, bucket|
+        memo[bucket.name] = bucket.elements
+        memo
+      end
+    end
+    
+    # Protected
+    # 
+    # Returns Hash of bucket elements, matching the wanted distribution as
+    # closely as possible.
+    def _select_wanted
+      final_count = self.estimated_final_count
       
-      while self.class.elements_count( selected ) > @wanted_count
-        # Calculate current variances from desired distribution. Ignore
-        # buckets with only one element, too.
-        variances = selected.keys.inject([]) do |memo, bucket_name|
-          size = selected[bucket_name].size
-          if size > 1
-            current_percent = size / @wanted_count.to_f
-            variance = @wanted_distribution[bucket_name] / current_percent
-            memo << [bucket_name, variance]
-          end
-          memo
-        end
-        break if variances.empty? # All have one element. Can't trim.
-        trim_bucket_name = variances.sort{ |a, b| a[1] }[0][0] # Smallest variance
-        selected[trim_bucket_name].pop
+      @buckets.values.inject({}) do |memo, bucket|
+        count = ( final_count * @wanted_distribution[bucket.name] ).round
+        count = [1, count].max # Ensure every bucket has at least one element
+        memo[bucket.name] = bucket.elements( count )
+        memo
+      end
+    end
+    
+    # Protected: Trim a given Hash of Arrays -- keyed by bucket names -- until
+    # it satisfies @wanted_count.
+    # 
+    # selected - A Hash of selected elements, keyed by the bucket names. All
+    #            values must be Arrays (or respond to `size`).
+    # size - The desired total size of `selected`.
+    def trim( selected, size )
+      raise ArgumentError.new( "Can't trim to a nil size" ) unless size
+      while self.class.elements_count( selected ) > size
+        candidates = self.trim_candidates( selected, @wanted_distribution )
+        selected[candidates.first].pop
       end
       
       selected
     end
     
+    # Protected
+    # 
+    # current_selections - Hash of element Arrays, keyed by bucket name.
+    # wanted_distribution - The wanted distribution as a hash of percentage
+    #                       Floats.
+    # 
+    # Returns Array of bucket names for buckets that are good trim candidates,
+    # ordered by best candidates first.
+    def trim_candidates( current_selections, wanted_distribution )
+      multipliers = self.needed_multipliers( current_selections, wanted_distribution ).to_a
+      multipliers.select do |bucket_name, multiplier|
+        # Can't trim empty buckets
+        @buckets[bucket_name].count != 0
+      end
+      return multipliers if multipliers.empty?
+      multipliers.sort! { |a, b| a[1] <=> b[1] } # Sort on multiplier ascending
+      multipliers.map{ |bucket_name, multiplier| bucket_name }
+    end
+    
+    # Protected
+    # 
+    # current_selections - Hash of element Arrays, keyed by bucket name.
+    # wanted_distribution - The wanted distribution as a hash of percentage
+    #                       Floats.
+    # 
+    # Returns Hash of multipliers needd for each bucket to reach its current
+    # wanted distribution.
+    def needed_multipliers( current_selections, wanted_distribution )
+      total_size = self.class.elements_count( current_selections )
+      
+      current_selections.keys.inject({}) do |memo, bucket_name|
+        bucket_size = current_selections[bucket_name].size
+        desired_pct = wanted_distribution[bucket_name]
+        current_pct = bucket_size.to_f / total_size
+        if current_pct > 0
+          memo[bucket_name] = desired_pct / current_pct
+        else
+          memo[bucket_name] = 1 / 0.0 # Infinity
+        end
+        memo
+      end
+    end
+    
+    # Protected
+    # 
+    # hash - Hash of Objects that respond to `count` (usually Arrays).
+    # 
     # Returns count of all elements in the Hash's Array values.
     def self.elements_count( hash )
       hash.values.inject(0){ |memo, array| memo + array.count }
     end
     
+    # Protected
+    # 
     # Returns projected final number of elements that will be returned to
-    # satisfy the requirements. If this is less than `@wanted_count`, when
+    # satisfy the requirements. If this is less than `@wanted_count`, if
     # supplied, we can't meet the requirements.
     def estimated_final_count
       limiter_bucket = self.limiter_bucket
@@ -127,6 +192,10 @@ module Splashy
       final_count
     end
     
+    # Protected
+    # 
+    # Raises a DistributionUnsatisfiedError if we can't meet the wanted
+    # distribution or count (or both).
     def assert_satisfied!
       if @total_count < @wanted_distribution.size
         raise DistributionUnsatisfiedError.new(
@@ -156,7 +225,11 @@ module Splashy
       end
     end
     
-    # Return the bucket that is the limiter in the distribution.
+    # Protected
+    # 
+    # Return the Bucket that is the current limiter in the distribution. In
+    # other words, this bucket is limiting the total size of the final
+    # selection.
     def limiter_bucket
       # Smallest value of "count / desired percent" is the limiter.
       @buckets.values.map do |bucket|

@@ -14,8 +14,12 @@ module Splashy
       @elements << element
     end
     
-    def elements( count )
-      @elements[0, count]
+    def elements( count = nil )
+      if count
+        @elements[0, count]
+      else
+        @elements
+      end
     end
     
     def empty?
