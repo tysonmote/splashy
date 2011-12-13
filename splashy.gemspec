@@ -4,14 +4,14 @@
 # -*- encoding: utf-8 -*-
 
 Gem::Specification.new do |s|
-  s.name = %q{splashy}
-  s.version = "0.1.0"
+  s.name = "splashy"
+  s.version = "0.1.1"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Tyson Tate"]
-  s.date = %q{2011-12-09}
-  s.description = %q{Simple distribution-based sampling of arbitrary objects from any number of buckets. Splashy. Buckets. Get it!?}
-  s.email = %q{tyson@tysontate.com}
+  s.date = "2011-12-13"
+  s.description = "Simple distribution-based sampling of arbitrary objects from any number of buckets. Splashy. Buckets. Get it!?"
+  s.email = "tyson@tysontate.com"
   s.extra_rdoc_files = [
     "LICENSE.txt",
     "README.markdown"
@@ -23,7 +23,6 @@ Gem::Specification.new do |s|
     "README.markdown",
     "Rakefile",
     "VERSION",
-    "buckets.gemspec",
     "lib/splashy.rb",
     "lib/splashy/bucket.rb",
     "lib/splashy/buckets.rb",
@@ -31,11 +30,11 @@ Gem::Specification.new do |s|
     "test/helper.rb",
     "test/test_splashy_buckets.rb"
   ]
-  s.homepage = %q{http://github.com/tysontate/splashy}
+  s.homepage = "http://github.com/tysontate/splashy"
   s.licenses = ["MIT"]
   s.require_paths = ["lib"]
-  s.rubygems_version = %q{1.4.2}
-  s.summary = %q{Simple distribution-based sampling of arbitrary objects from buckets.}
+  s.rubygems_version = "1.8.11"
+  s.summary = "Simple distribution-based sampling of arbitrary objects from buckets."
 
   if s.respond_to? :specification_version then
     s.specification_version = 3
