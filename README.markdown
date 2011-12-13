@@ -41,11 +41,16 @@ buckets.select
 #     :b => ["20", "21"],
 #     :c => ["30", "31", "32", "33", "34", "35", "36", "37"]
 #   }
+
+# Or even grab randomly:
+
+buckets.select( :random => true )
 ```
 
 Changelog
 =========
 
+* *0.1.1* - Add support for random selection from buckets.
 * *0.1.0* - Several bug fixes, add `#neediest_buckets` method to `Buckets` to
 allow you to choose which buckets to add to first if an element can be put in
 multiple buckets, final distributions can now have empty buckets if it means

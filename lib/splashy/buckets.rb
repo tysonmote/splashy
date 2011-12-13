@@ -69,9 +69,12 @@ module Splashy
     # 
     # Returns a Hash of elements matching the desired distribution, keyed by
     # the bucket names.
-    def select
+    def select( opts = {} )
       self.assert_satisfied!
-      selected = self._select_wanted
+      opts = { :random => false }.merge( opts )
+      
+      selected = self._select_wanted( opts[:random] )
+      
       # Sometimes we need to fudge by a few to meet the `@wanted_count`
       selected = self.trim( selected, @wanted_count ) if @wanted_count
       selected
@@ -101,13 +104,17 @@ module Splashy
     # 
     # Returns Hash of bucket elements, matching the wanted distribution as
     # closely as possible.
-    def _select_wanted
+    def _select_wanted( randomly = false )
       final_count = self.estimated_final_count
       
       @buckets.values.inject({}) do |memo, bucket|
         count = ( final_count * @wanted_distribution[bucket.name] ).round
         count = [1, count].max # Ensure every bucket has at least one element
-        memo[bucket.name] = bucket.elements( count )
+        if randomly
+          memo[bucket.name] = bucket.random_elements( count )
+        else
+          memo[bucket.name] = bucket.elements( count )
+        end
         memo
       end
     end

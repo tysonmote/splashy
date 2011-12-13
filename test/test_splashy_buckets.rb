@@ -241,6 +241,18 @@ describe Splashy::Buckets do
         @buckets.select
       )
     end
+    
+    it "selects randomly" do
+      @buckets = Splashy::Buckets.new( {:a => 0.5, :b => 0.20, :c => 0.30}, 10 )
+      fill_with_counts( 10, 10, 10 )
+      assert @buckets.satisfied?
+      randomized = @buckets.select( :random => true )
+      assert_equal( 5, randomized[:a].size )
+      assert_equal( 2, randomized[:b].size )
+      assert_equal( 3, randomized[:c].size )
+      # Non-deterministic, obv, but whatever.
+      assert_equal( false, randomized[:a].sort == randomized[:a] )
+    end
   end
   
   describe "variances" do
@@ -283,4 +295,3 @@ describe Splashy::Buckets do
     end
   end
 end
-

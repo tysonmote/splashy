@@ -8,7 +8,6 @@ rescue Bundler::BundlerError => e
   exit e.status_code
 end
 require 'minitest/autorun'
-# require 'minitest/unit'
 require 'minitest/benchmark'
 
 $LOAD_PATH.unshift(File.dirname(__FILE__))
