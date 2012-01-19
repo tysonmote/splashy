@@ -123,7 +123,7 @@ describe Splashy::Buckets do
       fill_with_counts( 3, 3, 3 )
       assert @buckets.satisfied?
       assert_equal(
-        {:a=>["10"], :b=>["20"], :c=>["30", "31"]},
+        {:a=>["10"], :b=>["20"], :c=>["30", "31", "32"]},
         @buckets.select
       )
     end
@@ -163,7 +163,19 @@ describe Splashy::Buckets do
       fill_with_counts( 10, 2, 40 )
       assert @buckets.satisfied?
       assert_equal(
-        {:a=>["10"], :b=>["20", "21"], :c=>["30", "31", "32", "33", "34", "35", "36", "37"]},
+        {:a=>["10"], :b=>["20", "21"], :c=>["30", "31", "32", "33", "34", "35", "36", "37", "38"]},
+        @buckets.select
+      )
+    end
+    
+    it "selects from a very small pool" do
+      @buckets = Splashy::Buckets.new( {:a => 0.33, :b => 0.67} )
+      @buckets.add( :a, "hoy" )
+      @buckets.add( :b, "zoy" )
+      @buckets.add( :b, "moy" )
+      assert @buckets.satisfied?
+      assert_equal(
+        {:a=>["hoy"], :b=>["zoy", "moy"]},
         @buckets.select
       )
     end
@@ -278,6 +290,13 @@ describe Splashy::Buckets do
       @buckets = Splashy::Buckets.new( {:a => 0.02, :b => 0.01, :c => 0.97} )
       fill_with_counts( 3, 3, 3 )
       assert_equal( [:c, :a, :b], @buckets.neediest_buckets )
+    end
+  end
+  
+  describe "neediness" do
+    it "provides descending list" do
+      @buckets = Splashy::Buckets.new( {:a => 0.33, :b => 0.67} )
+      assert_equal( [:b, :a], @buckets.neediest_buckets )
     end
   end
   
