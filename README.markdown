@@ -50,6 +50,7 @@ buckets.select( :random => true )
 Changelog
 =========
 
+* *0.1.2* - A few small bugs fixed in few-objects situations. (Thanks to Mars Hall)
 * *0.1.1* - Add support for random selection from buckets.
 * *0.1.0* - Several bug fixes, add `#neediest_buckets` method to `Buckets` to
 allow you to choose which buckets to add to first if an element can be put in
