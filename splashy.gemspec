@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = "splashy"
-  s.version = "0.1.1"
+  s.version = "0.1.2"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Tyson Tate"]
-  s.date = "2011-12-13"
+  s.date = "2012-01-19"
   s.description = "Simple distribution-based sampling of arbitrary objects from any number of buckets. Splashy. Buckets. Get it!?"
   s.email = "tyson@tysontate.com"
   s.extra_rdoc_files = [
