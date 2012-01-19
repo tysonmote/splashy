@@ -84,7 +84,7 @@ module Splashy
     # distribution, sorted descending by how much more they need.
     def neediest_buckets
       multipliers = self.needed_multipliers( self._select_all, @wanted_distribution ).to_a
-      multipliers.sort! { |a, b| b[1] <=> a[1] } # Sort on multiplier ascending
+      multipliers.sort! { |a, b| b[1] <=> a[1] } # Sort on multiplier descending
       multipliers.map{ |bucket_name, multiplier| bucket_name }
     end
     
@@ -169,10 +169,11 @@ module Splashy
         bucket_size = current_selections[bucket_name].size
         desired_pct = wanted_distribution[bucket_name]
         current_pct = bucket_size.to_f / total_size
+        current_pct = 0 if current_pct.nan?
         if current_pct > 0
-          memo[bucket_name] = desired_pct / current_pct
+          memo[bucket_name] = desired_pct - current_pct
         else
-          memo[bucket_name] = 1 / 0.0 # Infinity
+          memo[bucket_name] = desired_pct
         end
         memo
       end
@@ -194,7 +195,7 @@ module Splashy
     # supplied, we can't meet the requirements.
     def estimated_final_count
       limiter_bucket = self.limiter_bucket
-      final_count = ( limiter_bucket.count / @wanted_distribution[limiter_bucket.name] ).floor
+      final_count = ( limiter_bucket.count / @wanted_distribution[limiter_bucket.name] ).ceil # go upward here to avoid missing elements in low-quantity situations
       final_count = [@wanted_count, final_count].min if @wanted_count
       final_count
     end
